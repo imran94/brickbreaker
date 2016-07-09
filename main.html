@@ -11,7 +11,7 @@
 			var ballX = 75;
 			var ballY = 75;
 			var ballSpeedX = 5;
-			var ballSpeedY = 7;
+			var ballSpeedY = 10;
 
 			const PADDLE_WIDTH = 100;
 			const PADDLE_THICKNESS = 10;
@@ -55,18 +55,19 @@
 			function drawAll() {
 				drawRect(0,0, canvas.width,canvas.height, 'black');
 				drawCircle(ballX,ballY, 10, 'red');
-				drawRect(paddleX,canvas.height-PADDLE_DIST_FROM_EDGE, PADDLE_WIDTH,PADDLE_THICKNESS, 'white');
+				drawRect(paddleX, canvas.height-PADDLE_DIST_FROM_EDGE, PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
 			}
 
 			function moveAll() {
 				var paddleTopEdgeY = canvas.height - PADDLE_DIST_FROM_EDGE;
+				var paddleBottomEdgeY = paddleTopEdgeY + PADDLE_THICKNESS;
 				var paddleLeftEdgeX = paddleX;
 				var paddleRightEdgeX = paddleX + PADDLE_WIDTH;
 
 				ballX += ballSpeedX;
 				ballY += ballSpeedY;
 
-				if (ballX > canvas.width || ballX < 0) {
+				if (ballX > canvas.width || ballX <= 0) {
 					ballSpeedX *= -1;
 				}
 				if (ballY < 0) {
@@ -75,8 +76,17 @@
 				if (ballY > canvas.height) {
 					ballReset();
 				}
-				if (ballY >= paddleTopEdgeY && ballX >= paddleLeftEdgeX && ballX <= paddleRightEdgeX) {
-					ballSpeedY = -1
+				if (ballY >= paddleTopEdgeY && 
+					ballY <= paddleBottomEdgeY &&
+					ballX >= paddleLeftEdgeX &&
+					ballX <= paddleRightEdgeX) {
+
+					ballSpeedY *= -1
+
+					var centerOfPaddleX = paddleX + PADDLE_WIDTH / 2;
+					var ballDistFromPaddleCenter = ballX - centerOfPaddleX;
+
+					ballSpeedX = ballDistFromPaddleCenter * 0.35;
 				}
 			}
 
