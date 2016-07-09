@@ -13,11 +13,12 @@
 			var ballSpeedX = 5;
 			var ballSpeedY = 10;
 
-			const BRICK_WIDTH = 100;
-			const BRICK_HEIGHT = 50;
+			const BRICK_WIDTH = 80;
+			const BRICK_HEIGHT = 20;
 			const BRICK_GAP = 2;
-			const BRICK_COUNT = 4;
-			var brickGrid = new Array(BRICK_COUNT);
+			const BRICK_COLS = 10;
+			const BRICK_ROWS = 14;
+			var brickGrid = new Array(BRICK_COLS * BRICK_ROWS);
 
 			const PADDLE_WIDTH = 100;
 			const PADDLE_THICKNESS = 10;
@@ -28,6 +29,10 @@
 			var mouseY = 0;
 
 			var canvas, canvasContext;
+
+			function colRowToArrayIndex(col, row) {
+				return BRICK_COLS * row + col;
+			}
 
 			function updateMousePos(evt) {
 				var rect = canvas.getBoundingClientRect();
@@ -43,6 +48,8 @@
 				for (var i = 0; i < brickGrid.length; i++) {
 					brickGrid[i] = true;
 				}
+
+				brickGrid[12] = false;
 			}
 
 			window.onload = function() {
@@ -75,9 +82,14 @@
 			}
 
 			function drawBricks() {
-				for (var i = 0; i < brickGrid.length; i++) {
-					if (brickGrid[i]) {
-						colorRect(BRICK_WIDTH * i,0, BRICK_WIDTH - BRICK_GAP,BRICK_HEIGHT, 'blue');
+				for (var row = 0; row < BRICK_ROWS; row++) {
+					for (var col = 0; col < BRICK_COLS; col++) {
+						var currentIndex = colRowToArrayIndex(col, row);
+
+						if (brickGrid[currentIndex]) {
+							drawRect(BRICK_WIDTH * col,BRICK_HEIGHT * row, 
+								BRICK_WIDTH - BRICK_GAP, BRICK_HEIGHT - BRICK_GAP, 'blue');
+						}
 					}
 				}
 			}
@@ -93,11 +105,6 @@
 			}
 
 			function moveAll() {
-				var paddleTopEdgeY = canvas.height - PADDLE_DIST_FROM_EDGE;
-				var paddleBottomEdgeY = paddleTopEdgeY + PADDLE_THICKNESS;
-				var paddleLeftEdgeX = paddleX;
-				var paddleRightEdgeX = paddleX + PADDLE_WIDTH;
-
 				ballX += ballSpeedX;
 				ballY += ballSpeedY;
 
@@ -110,6 +117,22 @@
 				if (ballY > canvas.height) {
 					ballReset();
 				}
+
+				var ballBrickCol = Math.floor(ballX / BRICK_WIDTH);
+				var ballBrickRow = Math.floor(ballY / BRICK_HEIGHT);
+				var brickIndexUnderBall = colRowToArrayIndex(ballBrickCol, ballBrickRow);
+
+				if (brickIndexUnderBall >= 0 && 
+					brickIndexUnderBall < BRICK_COLS * BRICK_ROWS) {
+
+					brickGrid[brickIndexUnderBall] = false;
+				}
+
+				var paddleTopEdgeY = canvas.height - PADDLE_DIST_FROM_EDGE;
+				var paddleBottomEdgeY = paddleTopEdgeY + PADDLE_THICKNESS;
+				var paddleLeftEdgeX = paddleX;
+				var paddleRightEdgeX = paddleX + PADDLE_WIDTH;
+
 				if (ballY >= paddleTopEdgeY && 
 					ballY <= paddleBottomEdgeY &&
 					ballX >= paddleLeftEdgeX &&
