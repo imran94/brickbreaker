@@ -13,6 +13,12 @@
 			var ballSpeedX = 5;
 			var ballSpeedY = 10;
 
+			const BRICK_WIDTH = 100;
+			const BRICK_HEIGHT = 50;
+			const BRICK_GAP = 2;
+			const BRICK_COUNT = 4;
+			var brickGrid = new Array(BRICK_COUNT);
+
 			const PADDLE_WIDTH = 100;
 			const PADDLE_THICKNESS = 10;
 			const PADDLE_DIST_FROM_EDGE = 60;
@@ -33,6 +39,12 @@
 				paddleX = mouseX - (PADDLE_WIDTH / 2);
 			}
 
+			function brickReset() {
+				for (var i = 0; i < brickGrid.length; i++) {
+					brickGrid[i] = true;
+				}
+			}
+
 			window.onload = function() {
 				canvas = document.getElementById('gameCanvas');
 				canvasContext = canvas.getContext('2d');
@@ -41,6 +53,8 @@
 				setInterval(updateAll, 1000/framesPerSecond);
 
 				canvas.addEventListener('mousemove', updateMousePos);
+
+				brickReset();
 			}
 
 			function drawRect(topLeftX, topLeftY, width, height, colour) {
@@ -58,14 +72,22 @@
 			function drawText(text, textX,textY, color) {
 				canvasContext.fillStyle = color;
 				canvasContext.fillText(text, textX,textY);
+			}
 
-
+			function drawBricks() {
+				for (var i = 0; i < brickGrid.length; i++) {
+					if (brickGrid[i]) {
+						colorRect(BRICK_WIDTH * i,0, BRICK_WIDTH - BRICK_GAP,BRICK_HEIGHT, 'blue');
+					}
+				}
 			}
 
 			function drawAll() {
 				drawRect(0,0, canvas.width,canvas.height, 'black');
 				drawCircle(ballX,ballY, 10, 'red');
 				drawRect(paddleX, canvas.height-PADDLE_DIST_FROM_EDGE, PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
+
+				drawBricks();
 
 				drawText(mouseX+", "+mouseY, mouseX, mouseY, 'yellow');
 			}
